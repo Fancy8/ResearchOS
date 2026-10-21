@@ -6,6 +6,9 @@ on:
     branches: [main]
 permissions:
   contents: read
+concurrency:
+  group: researchos-verify-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   windows-integration:
     runs-on: windows-2022
@@ -21,18 +24,29 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '26.1.0'
-      - name: Build project-local runtime and services
-        run: ./tools/setup.ps1
-      - name: Install project-local browser
+      - name: Build runtime and verify in one service session
         run: |
-          $env:PLAYWRIGHT_BROWSERS_PATH=Join-Path $PWD 'runtime/browsers'
-          $env:TEMP=Join-Path $PWD 'runtime/tmp'
-          $env:TMP=$env:TEMP
-          $env:npm_config_cache=Join-Path $PWD 'runtime/cache/npm'
-          npm --prefix frontend exec playwright install chromium
-          if($LASTEXITCODE -ne 0){throw 'Browser installation failed'}
-      - name: Verify database, API, contracts and browser flow
-        run: ./tools/verify.ps1
+          # Keep service launchers and their consumers in the same pwsh process.
+          # setup.ps1 also establishes the project-local runtime environment.
+          try {
+            ./tools/setup.ps1
+            $python=Join-Path $PWD 'runtime/venv/Scripts/python.exe'
+            & $python tools/broker_status.py
+            if($LASTEXITCODE -ne 0){throw 'Broker unavailable immediately after setup'}
+            npm --prefix frontend exec playwright install chromium
+            if($LASTEXITCODE -ne 0){throw 'Browser installation failed'}
+            ./tools/verify.ps1
+          } finally {
+            # Redis has no authentication in this loopback-only synthetic CI setup.
+            # Keep only startup/shutdown diagnostics, never task bodies or app logs.
+            foreach($log in @('runtime/redis.stdout.log','runtime/redis.stderr.log')) {
+              if(Test-Path -LiteralPath $log) {
+                Get-Content -LiteralPath $log -Tail 20 |
+                  Where-Object { $_ -match '(?i)ready to accept|server initialized|fatal|error|failed|shutdown|warning|invalid' } |
+                  ForEach-Object { Write-Output $_ }
+              }
+            }
+          }
       - name: Retain test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
