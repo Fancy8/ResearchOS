@@ -132,7 +132,7 @@ cd ResearchOS
 | 文档与存储 | PDF.js、pypdf、Tiptap、私有 S3 兼容存储 | 阅读、数学笔记与来源文件 |
 
 ```mermaid
-flowchart LR
+flowchart TB
     web["Next.js 工作台"] --> api["FastAPI · 授权与事务"]
     api --> db["PostgreSQL · 业务与 outbox"]
     api --> files["私有 S3 兼容存储"]
