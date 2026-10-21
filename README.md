@@ -36,7 +36,7 @@ It is intended for individual graduate researchers working on literature reviews
 | Build a literature review with retrievable source passages | [Evidence and reasoning tour](docs/project-tour.md#follow-one-piece-of-evidence) |
 | Turn a method comparison into a documented experiment plan | [Research workflow example](#example) |
 | Evaluate the architecture and reliability mechanisms | [Engineering choices and code pointers](docs/project-tour.md#engineering-choices-behind-the-workflow) |
-| Try the alpha or contribute a focused improvement | [Quick start](#quickstart) · [Contribution routes](#contributing) |
+| Try the alpha or contribute a focused improvement | [Quick start](#quickstart) · [Contribution guide](CONTRIBUTING.md) |
 
 **What makes the workflow distinctive:** source identity, current interpretation, historical decisions, and planned actions are separate records connected by explicit references. A replacement PDF or a revised interpretation can coexist with the context preserved by an earlier decision.
 
