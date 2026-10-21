@@ -1,137 +1,238 @@
-<p align="center"><img src="docs/assets/researchos-cover.svg" alt="ResearchOS: from evidence to action" width="100%" /></p>
+<p align="center"><img src="docs/assets/researchos-cover.svg" alt="ResearchOS: from evidence to action, preserving sources and reasoning" width="100%" /></p>
 
-<p align="center"><a href="README.md">中文</a> · <b>English</b> · <a href="docs/README.md">Documentation</a> · <a href="docs/roadmap.md">Roadmap</a></p>
+<h1 align="center">ResearchOS · From evidence to action</h1>
 
-# ResearchOS
+<p align="center">An open-source workspace for individual researchers.<br/>Connect questions, papers, evidence, hypotheses, decisions, and tasks in a traceable research workflow.</p>
 
-A research workspace for individual graduate researchers: connect research questions, papers, evidence, hypotheses, decisions, and tasks in a traceable workflow.
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-315d49" /></a>
+  <img alt="Status: Early Alpha" src="https://img.shields.io/badge/Status-Early%20Alpha-dba865" />
+  <img alt="Python: 3.12" src="https://img.shields.io/badge/Python-3.12-3776ab" />
+  <img alt="Database: PostgreSQL" src="https://img.shields.io/badge/Database-PostgreSQL-4169e1" />
+  <a href="https://github.com/Fancy8/ResearchOS/actions/workflows/verify.yml"><img alt="Live GitHub Actions verification status" src="https://github.com/Fancy8/ResearchOS/actions/workflows/verify.yml/badge.svg" /></a>
+</p>
 
-**Status: early alpha.** This repository follows an enterprise-oriented engineering process, but production release gates remain open. No production deployment, external adoption, or independent security certification is claimed. AI features and team collaboration are outside the current P0 scope.
+<p align="center"><b>English</b> · <a href="README_ZH.md">简体中文</a><br/>
+<a href="#overview">Overview</a> · <a href="#features">Features</a> · <a href="#quickstart">Quick start</a> · <a href="#example">Example</a> · <a href="#documentation">Documentation</a> · <a href="#roadmap">Roadmap</a></p>
 
-## Project purpose / 项目用途
+> **Early Alpha.** The research workflow and several recovery mechanisms are implemented; full release acceptance remains open. The CI badge shows actual hosted status. AI features and team collaboration are future scope.
 
-ResearchOS helps an individual researcher keep the connection between **what they read, why they reached a conclusion, and what they plan to do next**. It is intended for literature reviews, tracking research questions, recording evidence-backed hypotheses, and turning decisions into tasks.
+<a id="overview"></a>
 
-面向个人硕博生和研究者，把“研究问题 → 文献证据 → 假设 → 决策 → 任务”串起来。适合在阅读多篇论文后整理依据、回顾判断过程，以及安排下一步验证。论文文件版本和决策修订保留历史，便于回看当时的依据。当前以个人研究记录为核心；AI 自动分析和多人协作属于后续范围。
+## 🎯 Overview
 
-For a concrete walkthrough, see [the usage example](#usage-example--使用示例) below.
+Can you find the original passage behind a research decision weeks later? Why was an experiment worth doing? When a hypothesis changes, can you still reconstruct what supported an earlier choice?
 
-## What is implemented
+**ResearchOS organizes work around research questions and connects source evidence, your reasoning, and your next action.** Papers can be reused across projects. Evidence retains its source version and location. Decision revisions preserve their supporting context. Tasks link to the exact decision revision that motivated them.
 
-- Private workspaces and object-level authorization with revocable sessions.
-- PDF upload and parsing, immutable source versions, and evidence anchors.
-- Research threads, hypotheses, immutable decision revisions, and research tasks.
-- Notes with mathematical content, conflict handling, and recovery drafts.
-- Transactional idempotency and recovery for interrupted uploads, creation, and exports.
-- Export manifests and source checksums; deletion and isolated backup/restore experiments.
+It is intended for individual graduate researchers working on literature reviews, method comparisons, experiment planning, and research reviews. For developers, it is also a full-stack engineering example of using relational constraints, transactions, authorization, and recovery to support history-sensitive workflows.
 
-The stack uses FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL, Next.js/React, Redis/Celery, and private S3-compatible storage. PostgreSQL is required.
+<img src="docs/assets/research-workflow.svg" alt="Question → paper → evidence → hypothesis → decision → task, with review feeding back into the question" width="100%" />
 
-## Supported systems / 支持系统
+## ✨ Design highlights
 
-| Environment | Current status |
-| --- | --- |
-| Windows x64 + PowerShell | Current local development/bootstrap target. The approved Python wheel lock requires **64-bit CPython 3.12**. Historical local validation is described below. |
-| Linux / macOS | No supported bootstrap or platform validation yet. The existing launchers and service binaries target Windows; platform-specific provisioning is required. |
-| Browser | Automated local browser coverage uses Playwright Chromium. Firefox, Safari, and mobile-device compatibility have not been established. |
-| Production hosting | Not yet supported as a validated release. Production platform isolation, deployment, and operations gates remain open. |
+| Design | Implementation approach | Practical value |
+| --- | --- | --- |
+| **Evidence with provenance** | PDF file versions, pages, source anchors, and retained source checksums | Revisit the specific source behind a claim |
+| **Decisions with history** | Immutable revisions and supporting-context snapshots | Distinguish what was known then from what is known now |
+| **Actions with a rationale** | Tasks retain the exact originating decision revision | Trace an experiment plan back to its reasoning |
+| **Recovery after interruption** | Original intent and transactional idempotency for creation, uploads, and exports | Recover unknown outcomes and reduce duplicate writes |
+| **Private-object authorization** | Server-side ownership checks for objects and associations, with workspace-scoped caching | Apply a consistent boundary to reads, links, search, and exports |
+| **Engineering with evidence** | Requirements mapping, OpenAPI contracts, Alembic migrations, real PostgreSQL, and fault cases | Connect requirements to implementation and verification |
 
-## Installation / 安装方式
+These describe implemented approaches, not a production certification. See [implementation status](docs/implementation-status.md) for validation boundaries.
 
-### Prerequisites
+<a id="features"></a>
 
-Install Git, **64-bit CPython 3.12**, **Node.js 26.1.0 with npm**, and PowerShell. Make `git`, `python`, `node`, and `npm` available in your terminal. Python 3.13 or another platform cannot use the current approved Windows CPython 3.12 wheel lock. Initial setup requires network access to download the pinned dependencies and local service binaries.
+## 🧩 Features
 
-```powershell
-git --version
-python --version
-node --version
-npm --version
-```
+| Module | What you can do | Current boundary |
+| --- | --- | --- |
+| 🗂️ Projects and research threads | Organize questions, stages, and related material | Individual workspaces |
+| 📄 Papers and PDF reading | Upload, parse, read, and retain historical file versions | Primarily text-based PDFs; no scanned-document OCR |
+| 🔎 Research evidence | Save passages, pages, anchors, and your interpretation | Anchor quality requires validation; arbitrary layouts are not guaranteed |
+| 💡 Hypotheses and decisions | Organize evidence, record choices, and preserve decision revisions | Researchers make scientific judgments |
+| ✅ Tasks and review | Turn decisions into actions and revisit activity history | No autonomous experiment execution |
+| 📝 Research notes | Edit structured notes and math, handle conflicts, and recover drafts | Browser recovery drafts contain plaintext research inputs |
+| 📦 Search and exports | Find authorized records and export archives with manifests and checksums | Production-scale capacity and recovery remain release gates |
 
-The existing bootstrap targets **Windows and PowerShell**, Python 3.12, and Node.js 26.1.0. Inspect `tools/setup.ps1`, dependency lockfiles, and `tools/services-lock.json` before running: setup downloads dependencies and local service binaries. The Windows hosted bootstrap and complete verification passed on 2026-10-21 at `de5ee22`; see the [verified run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264). Other platforms and production deployment still require validation.
+<a id="quickstart"></a>
 
-### Install and start
+## 🚀 Quick start
+
+### 1. Prepare your environment
+
+The current bootstrap targets **Windows x64 and PowerShell**. Install Git, **64-bit CPython 3.12**, and **Node.js 26.1.0 with npm**, and make the commands available in your terminal. Initial setup downloads pinned dependencies and local service binaries. Other Python versions and platforms cannot directly use the approved Windows CPython 3.12 wheel lock.
+
+### 2. Clone and install
 
 ```powershell
 git clone https://github.com/Fancy8/ResearchOS.git
 cd ResearchOS
 ./tools/setup.ps1
-# Generate a local invitation; this does not send email:
+```
+
+Setup prepares a project-local Python environment, PostgreSQL, Redis, private object storage, migrations, and the application. Generated runtime data stays in ignored `runtime/`, outside the published source tree.
+
+### 3. Create your workspace
+
+```powershell
+# Replace the example address. The command prints a local invitation token; it sends no email.
 ./runtime/venv/Scripts/python.exe ./tools/invite.py your-email@example.com
 ```
 
-Open http://localhost:3000/login and http://127.0.0.1:58000/api/docs after startup. Services bind to loopback. Generated credentials, databases, logs, caches, and downloaded binaries belong under ignored `runtime/`. Test reports belong under ignored `artifacts/`.
+Open **[login and registration](http://localhost:3000/login)**. Switch to registration, enter the same email, invitation token, display name, and a password of at least 12 characters, then complete onboarding. Developers can use the [local API documentation](http://127.0.0.1:58000/api/docs).
 
-Use your own email in the invitation command. On the login page, switch to registration and enter that same email, the generated invitation token, your display name, and a password of at least 12 characters. Follow onboarding, then sign in to your workspace. The invitation command prints a token locally; it does not send an email. Do not publish the token.
+<details>
+<summary><b>Subsequent starts and development verification</b></summary>
 
-首次安装：检查依赖版本 → 克隆代码 → 运行 `setup.ps1` → 为自己的邮箱生成邀请码 → 打开登录页并切换注册 → 完成引导。脚本会准备本地 PostgreSQL、对象存储、队列、数据库迁移和应用。运行环境保存在项目目录，不需要另行安装全局数据库服务。
-
-On subsequent starts, run these commands from the repository directory:
+Run from the repository root:
 
 ```powershell
 ./tools/start-services.ps1
 ./tools/start.ps1
-```
-
-### Verify the development environment
-
-```powershell
+# Complete development verification, using dedicated test databases:
 ./tools/verify.ps1
 ```
 
-Verification uses dedicated real PostgreSQL databases and local object storage. Do not point it at production data. Read [local operations](docs/operating-local.md) before administration or recovery operations. The storage launcher contains fixed local-development credentials; replace these and review service isolation before any non-loopback deployment.
+Verification uses real PostgreSQL and local object storage. Do not point it at production data. The [installation guide](docs/getting-started.md) covers version, download, registration, and startup checks; the detailed guide is currently in Chinese.
 
-## Usage example / 使用示例
+</details>
 
-The following is a **fictional walkthrough**, not a published study or a preloaded dataset. Use a small, text-based PDF that you created or have permission to upload; scanned-PDF OCR is not provided.
-
-示例目标：记录“学习率对模型收敛的影响”这一研究问题，从阅读依据安排下一步实验。
-
-| Record | Example content |
+| Platform | Status |
 | --- | --- |
-| Project / 课题 | 学习率与收敛行为 |
-| Research thread / 研究线索 | 更小的学习率是否能减少训练后期的震荡？ |
-| Paper and evidence / 文献与证据 | 上传自己的示例 PDF，选择其中一段文字并保存为带来源定位的证据。 |
-| Hypothesis / 待验证假设 | 较小学习率可能降低训练后期震荡，但可能增加收敛所需步数。 |
-| Decision / 研究决策 | 依据当前证据，先安排对照实验，并记录假设与局限。 |
-| Task / 科研任务 | 固定数据、模型和随机种子，比较两个学习率并记录损失曲线。 |
+| Windows x64 / PowerShell | Current development target; the complete hosted workflow has passed |
+| Linux / macOS | No supported bootstrap or platform acceptance yet |
+| Browser | Local automated coverage uses Playwright Chromium; other browsers and real mobile devices need validation |
+| Production hosting | Platform isolation, operations, and capacity gates remain open |
 
-1. Create the project and a research thread with the question above.
-2. Upload your sample PDF to the paper library, wait for parsing, and open the paper.
-3. Save a passage as evidence with its source location, and associate it with the research thread.
-4. Record the hypothesis and a decision with the relevant evidence. Treat the hypothesis as unverified.
-5. Create a task from the decision. After doing the experiment, record the outcome and revise the decision as needed; earlier decision revisions retain their historical context.
-6. Review the links between the question, evidence, decision, and task. Use the workspace export to inspect the archive and manifest when you need a portable record.
+<a id="example"></a>
 
-Expected result: you can trace a planned action back to the decision and the source evidence behind it. The steps illustrate record keeping; they do not establish the scientific hypothesis. Detailed product behavior and acceptance criteria are in [the product baseline](docs/01-product-baseline.md).
+## 🧪 A research workflow example
 
-## Engineering evidence and remaining work
+Try a **fictional learning-rate question** using a small text-based PDF you created. This is an illustrative workflow, not a study or a preloaded scientific conclusion.
 
-At source commit `ecb1afe`, local validation on 2026-10-16 recorded 191 backend tests and 76 browser tests passing. These are historical local results, not a claim about the current GitHub Actions run. Public CI results must be checked separately. The public snapshot is based on local commit `6f80a53`, with publication-only documentation, exclusions, and path normalization described in [publication notes](docs/publication-notes.md).
+| Step | Example record | Context to retain |
+| --- | --- | --- |
+| Ask | Does a smaller learning rate reduce late-training oscillation? | Project and research thread |
+| Read | Upload your own sample PDF | Source version and parsing status |
+| Capture | Save a passage and your interpretation | Page, anchor, and source |
+| Decide | Record an unverified hypothesis and plan a controlled comparison | Supporting context and decision revision |
+| Act | Fix the model, data, and seed; compare two learning rates | Task provenance and rationale |
+| Review | Record observations, revise the decision, and export | Historical revisions and archive manifest |
 
-Remaining work includes full page/error/accessibility acceptance, broader PDF compatibility, multi-tab and late-response recovery cases, fresh-host/hosted CI, production platform isolation, supply-chain review, independent recovery witnesses, capacity tests, SMTP/provider verification, and production backup key escrow/retention. Browser recovery drafts contain plaintext research inputs. Windows Celery solo operation is a local development arrangement. Formal backup scheduling and production deployment are not enabled by this release.
+The goal is to trace a planned action back to a decision and its evidence. The application does not establish the hypothesis or run the experiment. The [detailed walkthrough](docs/research-walkthrough.md) and [product baseline](docs/01-product-baseline.md) are currently in Chinese.
 
-## Documentation and contributions
+## 🏗️ Technology and engineering
 
-Use [Issues](https://github.com/Fancy8/ResearchOS/issues) for reproducible bugs and concrete feature requests. Use [Discussions](https://github.com/Fancy8/ResearchOS/discussions) for setup questions, research-workflow ideas, and general feedback. Both channels are public; use synthetic examples and keep private research material out of posts. For vulnerabilities, follow [the security policy](SECURITY.md).
+| Layer | Technologies | Responsibility |
+| --- | --- | --- |
+| Web | Next.js, React, TypeScript, TanStack Query | Workspace, private cache, reading and editing |
+| API | FastAPI, Pydantic, SQLAlchemy 2.0 | Identity, object authorization, contracts, transactions |
+| Data | PostgreSQL, Alembic | Constraints, revisions, idempotency receipts, migrations |
+| Background work | PostgreSQL outbox, Redis, Celery | Durable dispatch, parsing, export, recovery |
+| Documents and storage | PDF.js, pypdf, Tiptap, private S3-compatible storage | Reading, mathematical notes, source files |
 
-- [Product requirements and acceptance mapping](docs/01-product-baseline.md)
-- [Architecture](docs/02-architecture.md), [data and ORM](docs/03-data-and-orm.md), [API contract](docs/04-api-contract.md)
-- [Implementation status](docs/implementation-status.md) and [creation recovery handoff](docs/research-creation-handoff.md)
-- [Contributing](CONTRIBUTING.md), [security reporting](SECURITY.md), [third-party notices](THIRD_PARTY_NOTICES.md)
+```mermaid
+flowchart TB
+    web["Next.js workspace"] --> api["FastAPI · authorization and transactions"]
+    api --> db["PostgreSQL · domain data and outbox"]
+    api --> files["Private S3-compatible storage"]
+    db --> dispatch["Dispatcher"]
+    dispatch --> queue["Redis"]
+    queue --> worker["Celery Worker"]
+    worker --> db
+    worker --> files
+```
 
-Most detailed design documents are currently in Chinese. Contributions to reproducible setup, fault recovery, authorization testing, accessibility, and English documentation are welcome. Project development has used AI-assisted tools; maintainers remain responsible for review and release decisions.
+This diagram shows module relationships. Windows Celery solo is a local development arrangement; production platform support and full OS isolation need validation. See [architecture](docs/02-architecture.md) and [data/ORM design](docs/03-data-and-orm.md).
 
-## License
+### Quality and verification
 
-Original ResearchOS code is available under the [MIT License](LICENSE). Copied/adapted code and PDF.js retain their own notices and license terms in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and `licenses/`. No user research library, private design conversations, local credentials, or runtime binaries are included.
+| Evidence | Result | Scope |
+| --- | --- | --- |
+| Hosted Windows workflow | [Complete run passed](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) | 2026-10-21, repair commit `de5ee22` |
+| Backend and browser tests | 191 backend and 76 browser tests passed | Actual hosted execution; 1 backend warning |
+| Additional gates | 25 dependency-tool tests, 3 math-security tests, typecheck, build, contracts, and migrations passed | See [CI verification notes](docs/ci-verification.md) |
+| Earlier local validation | 191 backend and 76 browser tests passed on 2026-10-16 | Historical local evidence, application source through `ecb1afe` |
 
+The badge links to current hosted status. Passing this workflow does not close all production release gates or establish an independent security certification. The public snapshot excludes local credentials, databases, private original material, and test traces; see [publication notes](docs/publication-notes.md).
 
-## Documentation paths
+<a id="documentation"></a>
 
-The main homepage and detailed guides are in Chinese. Start with the [installation guide](docs/getting-started.md), [research walkthrough](docs/research-walkthrough.md), [documentation map](docs/README.md), and [roadmap](docs/roadmap.md).
+## 📚 Documentation
 
-The initial hosted broker-check failure was resolved by keeping setup, browser installation, and verification in one PowerShell service session. The [complete Windows hosted run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) at `de5ee22` passed on 2026-10-21: 25 dependency-tool tests, 191 backend tests, 3 math-security tests, and 76 browser tests, plus contracts, migration checks, typecheck, and production build. See [CI verification notes](docs/ci-verification.md).
+Most detailed guides and design documents are currently **in Chinese**. This English homepage provides the project overview, installation commands, workflow example, and contribution routes.
 
-The homepage structure takes inspiration from [Datawhale Hello-Agents](https://github.com/datawhalechina/hello-agents). ResearchOS prose and visual assets are original; this does not imply affiliation or endorsement.
+| Start here | Contents | Audience |
+| --- | --- | --- |
+| [Installation](docs/getting-started.md) | Environment, registration, startup, troubleshooting | New users and contributors |
+| [Research walkthrough](docs/research-walkthrough.md) | Evidence, decisions, and tasks using synthetic material | Researchers |
+| [Product baseline](docs/01-product-baseline.md) | F01–F15, business rules, acceptance mapping | Product and QA |
+| [Architecture](docs/02-architecture.md) | Modules, data, and task flow | Full-stack developers |
+| [Data/ORM](docs/03-data-and-orm.md) / [API contract](docs/04-api-contract.md) | History, authorization, idempotency, protocols | Backend and frontend developers |
+| [Experience design](docs/05-experience-design.md) | Pages and interaction states | Frontend and design |
+| [Delivery plan](docs/06-delivery-plan.md) / [Quality plan](docs/07-quality-and-operations.md) | Issues, tests, release gates | Maintainers and QA |
+| [Implementation status](docs/implementation-status.md) / [CI evidence](docs/ci-verification.md) | Verified scope and remaining work | Contributors |
+
+👉 [Full documentation map and suggested reading order](docs/README.md)
+
+<a id="roadmap"></a>
+
+## 🧭 Roadmap
+
+- **Alpha acceptance:** multi-tab contention, late responses, corrupt/expired drafts, failure states, and accessibility.
+- **Reproducible maintenance:** ongoing hosted CI, broader clean-environment coverage, dependency and service-binary review.
+- **Release validation:** production isolation, capacity, independent recovery witnesses, backup key escrow, and real email providers.
+- **After product validation:** scoped AI assistance, import integrations, and collaboration with separately reviewed data authorization and permission models.
+
+These are directions, not shipped features or promised dates. See the [detailed roadmap](docs/roadmap.md).
+
+## 🤝 Contributing
+
+| I want to… | Route |
+| --- | --- |
+| Report a reproducible bug or concrete feature request | [Issues](https://github.com/Fancy8/ResearchOS/issues) |
+| Discuss installation, research workflows, or general ideas | [Discussions](https://github.com/Fancy8/ResearchOS/discussions) |
+| Improve code, tests, translation, or documentation | [Contribution guide](CONTRIBUTING.md) |
+| Report a vulnerability privately | [Security policy](SECURITY.md) |
+
+Useful starting points include documentation links, setup reproduction, synthetic PDF compatibility cases, failure-state tests, and accessibility. Development uses AI-assisted tools; maintainers remain responsible for review and release decisions. Share only material you are authorized to publish.
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is this an autonomous AI research tool?</b></summary>
+
+The current focus is research records and evidence traceability. Researchers decide hypotheses, conclusions, and next steps. AI question answering and research navigation are future scope.
+
+</details>
+
+<details>
+<summary><b>Can I deploy it to real users today?</b></summary>
+
+It is an early alpha. Security, PDF compatibility, accessibility, capacity, production platform, backup, and real-user acceptance gates remain open. Launchers bind to loopback; fixed storage development credentials are not production settings.
+
+</details>
+
+<details>
+<summary><b>What should stay out of the public repository?</b></summary>
+
+Real credentials, databases, private PDFs, sessions, browser traces, and unredacted logs. Migrations, synthetic fixtures, and reviewed summaries can be contributed. Keep `runtime/` and `artifacts/` ignored.
+
+</details>
+
+<details>
+<summary><b>How should I read the CI badge and historical test results?</b></summary>
+
+The badge shows hosted workflow status. Dated local runs are separate evidence. The [2026-10-21 repair run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) passed the complete Windows workflow; future runs may reveal new failures.
+
+</details>
+
+## 📄 License and acknowledgments
+
+Original code is available under the [MIT License](LICENSE). Adapted FastAPI template code, Open Notebook components, PDF.js, and other dependencies retain their own notices; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and `licenses/`.
+
+The homepage organization takes inspiration from [Datawhale Hello-Agents](https://github.com/datawhalechina/hello-agents). ResearchOS prose, cover, and workflow artwork were made for this project; no affiliation or endorsement is implied.
+
+<p align="center"><b>Keep the source. Preserve the reasoning. Connect your next step to the research question.</b></p>

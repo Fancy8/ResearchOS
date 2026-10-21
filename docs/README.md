@@ -1,6 +1,6 @@
 # ResearchOS 文档地图
 
-[项目首页](../README.md) · [English](../README_EN.md) · [贡献指南](../CONTRIBUTING.md)
+[English homepage](../README.md) · [中文首页](../README_ZH.md) · [贡献指南](../CONTRIBUTING.md)
 
 文档分成上手指南、产品与架构基线、实际验证记录、运行手册。**设计目标不等于已实现；局部验证不等于发布完成。** 当前阶段和未完成门禁以实际实现记录及 CI 为准。
 
