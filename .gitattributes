@@ -1,0 +1,4 @@
+* text=auto eol=lf
+docs/sources/*.txt -text
+*.png binary
+*.zip binary

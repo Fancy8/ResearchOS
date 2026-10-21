@@ -1,0 +1,41 @@
+name: Python dependency advisories
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '31 3 * * 1'
+  pull_request:
+    paths:
+      - 'backend/*requirements.lock.txt'
+      - 'backend/dependency-artifacts.json'
+      - 'tools/**'
+      - '.github/workflows/python-advisories.yml'
+permissions:
+  contents: read
+jobs:
+  package-advisories:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install approved project Python wheels
+        run: ./tools/install-python-dependencies.ps1
+      - name: Test integrity and audit failure handling
+        run: ./runtime/venv/Scripts/python.exe -m pytest tools/tests -q --junitxml=artifacts/dependency-tools.xml
+      - name: Audit complete runtime and isolated tooling
+        run: ./tools/audit-dependencies.ps1
+      - name: Retain advisory evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: python-dependency-advisories
+          path: |
+            artifacts/python-*-audit*.json
+            artifacts/python-advisory-run.json
+            artifacts/dependency-tools.xml
+          retention-days: 14

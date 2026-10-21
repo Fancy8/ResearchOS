@@ -1,0 +1,13 @@
+runtime/
+artifacts/
+vendor/
+.env
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+frontend/node_modules/
+frontend/.next/
+frontend/playwright-report/
+frontend/test-results/
+*.log
+*.tsbuildinfo
