@@ -110,6 +110,8 @@ Remaining work includes full page/error/accessibility acceptance, broader PDF co
 
 ## Documentation and contributions
 
+Use [Issues](https://github.com/Fancy8/ResearchOS/issues) for reproducible bugs and concrete feature requests. Use [Discussions](https://github.com/Fancy8/ResearchOS/discussions) for setup questions, research-workflow ideas, and general feedback. Both channels are public; use synthetic examples and keep private research material out of posts. For vulnerabilities, follow [the security policy](SECURITY.md).
+
 - [Product requirements and acceptance mapping](docs/01-product-baseline.md)
 - [Architecture](docs/02-architecture.md), [data and ORM](docs/03-data-and-orm.md), [API contract](docs/04-api-contract.md)
 - [Implementation status](docs/implementation-status.md) and [creation recovery handoff](docs/research-creation-handoff.md)
