@@ -2,3 +2,6 @@
 docs/sources/*.txt -text
 *.png binary
 *.zip binary
+
+# Distributed upstream PDF.js worker; keep it out of first-party language totals.
+frontend/public/pdf.worker.min.mjs linguist-vendored=true
