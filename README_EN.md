@@ -29,6 +29,17 @@ It is intended for individual graduate researchers working on literature reviews
 
 <img src="docs/assets/research-workflow.svg" alt="Question → paper → evidence → hypothesis → decision → task, with review feeding back into the question" width="100%" />
 
+## 🧑‍🔬 Find your starting point
+
+| Your goal | Explore |
+| --- | --- |
+| Build a literature review with retrievable source passages | [Evidence and reasoning tour](docs/project-tour.md#follow-one-piece-of-evidence) |
+| Turn a method comparison into a documented experiment plan | [Research workflow example](#example) |
+| Evaluate the architecture and reliability mechanisms | [Engineering choices and code pointers](docs/project-tour.md#engineering-choices-behind-the-workflow) |
+| Try the alpha or contribute a focused improvement | [Quick start](#quickstart) · [Contribution routes](#contributing) |
+
+**What makes the workflow distinctive:** source identity, current interpretation, historical decisions, and planned actions are separate records connected by explicit references. A replacement PDF or a revised interpretation can coexist with the context preserved by an earlier decision.
+
 ## ✨ Design highlights
 
 | Design | Implementation approach | Practical value |
@@ -39,6 +50,8 @@ It is intended for individual graduate researchers working on literature reviews
 | **Recovery after interruption** | Original intent and transactional idempotency for creation, uploads, and exports | Recover unknown outcomes and reduce duplicate writes |
 | **Private-object authorization** | Server-side ownership checks for objects and associations, with workspace-scoped caching | Apply a consistent boundary to reads, links, search, and exports |
 | **Engineering with evidence** | Requirements mapping, OpenAPI contracts, Alembic migrations, real PostgreSQL, and fault cases | Connect requirements to implementation and verification |
+
+[Explore the English guided tour →](docs/project-tour.md) Follow one piece of evidence, inspect recovery behavior, and find the relevant code and tests.
 
 These describe implemented approaches, not a production certification. See [implementation status](docs/implementation-status.md) for validation boundaries.
 
@@ -162,10 +175,11 @@ The badge links to current hosted status. Passing this workflow does not close a
 
 ## 📚 Documentation
 
-Most detailed guides and design documents are currently **in Chinese**. This English homepage provides the project overview, installation commands, workflow example, and contribution routes.
+Most detailed guides and design documents are currently **in Chinese**. This English homepage and the [guided tour](docs/project-tour.md) provide the project overview, installation commands, workflow examples, engineering rationale, and contribution routes.
 
 | Start here | Contents | Audience |
 | --- | --- | --- |
+| [English guided tour](docs/project-tour.md) | Research scenarios, engineering choices, recovery example, repository map | New readers and technical evaluators |
 | [Installation](docs/getting-started.md) | Environment, registration, startup, troubleshooting | New users and contributors |
 | [Research walkthrough](docs/research-walkthrough.md) | Evidence, decisions, and tasks using synthetic material | Researchers |
 | [Product baseline](docs/01-product-baseline.md) | F01–F15, business rules, acceptance mapping | Product and QA |

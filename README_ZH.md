@@ -29,6 +29,17 @@
 
 <img src="docs/assets/research-workflow.svg" alt="研究闭环：问题 → 文献 → 证据 → 假设 → 决策 → 任务，复盘后回到研究问题" width="100%" />
 
+## 🧑‍🔬 从你的研究场景出发
+
+| 想完成的工作 | 建议入口 |
+| --- | --- |
+| 整理综述，让每段解释能回到原文 | [英文导览：追踪一条证据](docs/project-tour.md#follow-one-piece-of-evidence) |
+| 比较方法，形成有依据的实验计划 | [研究闭环示例](docs/research-walkthrough.md) |
+| 了解工程优势及对应实现依据 | [英文导览：工程选择与代码入口](docs/project-tour.md#engineering-choices-behind-the-workflow) |
+| 试用 Alpha 或参与贡献 | [快速开始](#quickstart) · [贡献指南](CONTRIBUTING.md) |
+
+**这个工作流的关键在于分开保存来源身份、当前解释、历史决策和行动，并用明确引用连接它们。** 替换 PDF 或修正解释时，仍能理解旧决策形成时使用的上下文。新增[英文项目导览](docs/project-tour.md)进一步介绍适用场景、故障恢复、仓库结构和参与方式。
+
 ## ✨ 设计亮点
 
 | 设计 | 具体做法 | 带来的价值 |
