@@ -17,3 +17,7 @@ The public homepage now has a Chinese main edition, an English entry, original S
 The upstream distributed PDF.js worker is marked `linguist-vendored` for GitHub language statistics, preserving its content and license. Application code, dependencies, migrations, and runtime behavior are unchanged by this presentation update.
 
 At review time, the three initial hosted runs had failed at the complete verification step, including `b34545c`. The homepage links actual Actions results and distinguishes them from dated local tests. This update does not resolve or certify that CI failure.
+
+## Hosted failure resolved — 2026-10-21
+
+The initial broker failure described above is historical. The [complete repair run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) at `de5ee22` succeeded; see [CI verification](ci-verification.md). Original application and test assertions were retained.

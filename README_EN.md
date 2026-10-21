@@ -49,7 +49,7 @@ node --version
 npm --version
 ```
 
-The existing bootstrap targets **Windows and PowerShell**, Python 3.12, and Node.js 26.1.0. Inspect `tools/setup.ps1`, dependency lockfiles, and `tools/services-lock.json` before running: setup downloads dependencies and local service binaries. A fresh-host setup and hosted CI have not yet been independently verified.
+The existing bootstrap targets **Windows and PowerShell**, Python 3.12, and Node.js 26.1.0. Inspect `tools/setup.ps1`, dependency lockfiles, and `tools/services-lock.json` before running: setup downloads dependencies and local service binaries. The Windows hosted bootstrap and complete verification passed on 2026-10-21 at `de5ee22`; see the [verified run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264). Other platforms and production deployment still require validation.
 
 ### Install and start
 
@@ -132,6 +132,6 @@ Original ResearchOS code is available under the [MIT License](LICENSE). Copied/a
 
 The main homepage and detailed guides are in Chinese. Start with the [installation guide](docs/getting-started.md), [research walkthrough](docs/research-walkthrough.md), [documentation map](docs/README.md), and [roadmap](docs/roadmap.md).
 
-As of the 2026-10-21 presentation review, the public workflow at `b34545c` failed at the complete verification step. See [the actual run](https://github.com/Fancy8/ResearchOS/actions/runs/39579714132). Historical local results above do not establish current hosted-CI success.
+The initial hosted broker-check failure was resolved by keeping setup, browser installation, and verification in one PowerShell service session. The [complete Windows hosted run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) at `de5ee22` passed on 2026-10-21: 25 dependency-tool tests, 191 backend tests, 3 math-security tests, and 76 browser tests, plus contracts, migration checks, typecheck, and production build. See [CI verification notes](docs/ci-verification.md).
 
 The homepage structure takes inspiration from [Datawhale Hello-Agents](https://github.com/datawhalechina/hello-agents). ResearchOS prose and visual assets are original; this does not imply affiliation or endorsement.

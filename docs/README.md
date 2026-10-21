@@ -30,6 +30,7 @@
 | 文档 | 关注点 |
 | --- | --- |
 | [实现进展](implementation-status.md) / [验收进度](acceptance-progress.md) | 当前实现、历史证据与未完成验收 |
+| [CI 修复与完整运行](ci-verification.md) | 托管环境队列修复、成功运行与各门禁结果 |
 | [创建恢复交接](research-creation-handoff.md) | 原始意图、幂等回执与剩余专门用例 |
 | [上传恢复](upload-recovery-acceptance.md) | 上传与解析状态的恢复边界 |
 | [证据状态](evidence-state-acceptance.md) | 来源版本、捕获与阅读定位 |

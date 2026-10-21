@@ -343,3 +343,10 @@ newer than a backup's minimum cannot be ruled out by a local chain alone.
 Backup retention is not configured by default; online deletion is reported
 separately and backup erasure is not claimed. No real-user trial or external
 production deployment has occurred. Enterprise release acceptance remains incomplete.
+
+
+## Hosted CI verification — 2026-10-21
+
+The [complete Windows hosted run](https://github.com/Fancy8/ResearchOS/actions/runs/39583284264) passed at `de5ee22d2b6105496aad1e213cf08e7e4ec81a8f` after setup, service startup, browser installation, and verification were kept in the same PowerShell process. The original later-step broker metadata check had returned `BROKER_STATUS_UNAVAILABLE`; after the change both the immediate setup probe and the verification probe succeeded.
+
+Verified: 25 dependency-tool tests, 191 backend tests (one warning), 3 math-security tests, 76 browser tests, 105 approved runtime/bootstrap packages, 74 API paths and 143 schemas, migration drift/head checks, frontend typecheck and production build. The backend run took 235.34 seconds and the browser run 5.1 minutes. This establishes this hosted Windows run, not all production/platform or remaining enterprise release gates. See `docs/ci-verification.md` from the repository root.
